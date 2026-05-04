@@ -1,14 +1,15 @@
-import React from 'react'
 import { Stack } from 'expo-router'
-import { Statusbar } from 'expo-status-bar'
+import { StatusBar } from 'expo-status-bar'
+import React from 'react'
 
-export default function _layout() {
+export default function RootLayout() {
   return (
-    <Stack>
-        <Stack.Screen 
-        name="index" options={{ headerShown: false }} />
-        <StackScreen 
-        name="home" options={{ headerShown: false }} />
-    </Stack>
+    <>
+      <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="home" options={{ headerShown: false }} />
+      </Stack>
+      <StatusBar style='light' />
+    </>
   )
 }
