@@ -4,16 +4,17 @@ import { StyleSheet, Text, View, Image } from 'react-native';
 export default function Welcome() {
   return (
     <View style={styles.container}>
-      <View style={styles.containerImage} >
+      <View style={styles.containerImage}>
         <Image
           source={require('../assets/avatar.png')}
-          styles={styles.avatar}
+          style={styles.avatar}
         />
       </View>
       <View style={styles.content}>
-        <Text style={styles.title}>Lista de Compras</Text>
+        <Text style={styles.title}>Gallo Shopping List</Text>
         <Text style={styles.text}>
-          Monte sua lista de compras e não esqueça mais o que precisa comprar ao sair de casa!
+          Monte sua lista de compras e não esqueça mais o que precisa
+          comprar ao sair de casa!!!
         </Text>
         <Link style={styles.button} href={"/home"}>
           <Text style={styles.buttonText}>Acessar</Text>
@@ -24,46 +25,39 @@ export default function Welcome() {
 }
 
 const styles = StyleSheet.create({
-  
   container: {
     flex: 1,
     backgroundColor: '#000',
   },
-
   containerImage: {
     flex: 2,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
-
   avatar: {
     width: 230,
     height: 230,
     borderRadius: 115,
     resizeMode: 'cover',
   },
-
   content: {
     flex: 1,
     marginHorizontal: 5,
     backgroundColor: '#dadada',
     borderTopLeftRadius: 25,
-    borderTopRadius: 25,
+    borderTopRightRadius: 25,
     paddingHorizontal: '5%'
   },
-
   title: {
     fontSize: 30,
     fontWeight: 'bold',
     marginVertical: 20,
-    textAlign: 'center'
+    textAlign: 'center',
   },
-
   text: {
     fontSize: 16,
-    color: 'gray,'    
+    color: 'gray',
   },
-
   button: {
     position: 'absolute',
     backgroundColor: '#000',
@@ -74,12 +68,9 @@ const styles = StyleSheet.create({
     width: '60%',
     textAlign: 'center',
   },
-
-  buttomText: {
-    fontSize: 22, 
-    color: '#fff', 
+  buttonText: {
+    fontSize: 22,
+    color: '#fff',
     fontWeight: 'bold'
   },
 });
-  
-
