@@ -1,77 +1,164 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect} from 'react';
 import {
-  Alert,
-  FlatList,
-  ImageBackground,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
+    Alert, 
+    FlatList,
+    ImageBackground,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity, 
+    View
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import ItemList from '../components/ItemList';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Home() {
   const [textInput, setTextInput] = useState('');
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState ([]);
 
-  function addProduto() {
-    // console.log(textInput);
-    if (textInput == '') {
-      Alert.alert(
-        'Ocorreu um problema :(',
-        'Por favor, informe o nome do produto'
-      );
-      return;
-    }
-    const newItem = {
-      id: Date.now().toString(),
-      name: textInput,
-      bought: false
-    };
-    setItems([...items, newItem]);
-    setTextInput('');
+  useEffect(() => {
+    getItemFromDevice();
+  }, []);
+
+    useEffect(() => {
+      saveItemToDevice();
+    }, [items]);
+
+// Função para salvar a lista no storage do aparelho celular
+const saveItemToDevice = async () => {
+  try {
+    const itemJson = JSON.stringify(items);
+    await AsyncStorage.setItem('ListaDeCompras', itemJson);
+  } catch (error) {
+    console.log('Erro: ${error}');    
   }
+};
+
+//Função para buscar a lista do storage
+const getItemFromDevice = async () => {
+  try {
+    const items = await AsyncStorage.getItem('ListaDeCompras');
+    if (items != null) 
+      setItems(JSON.parse(items));
+  } catch (error) {
+    console.log('Erro: ${error}');
+    
+  }
+};
+
+    function addProduto() {
+      //console.log(textInput);
+      if (textInput == '') {
+        Alert.alert(
+          'Ocorreu um problema :(',
+          'Por favor, informe o nome do produto'
+        );
+        return;
+      }
+      const newItem = {
+        id: Date.now().toString(),
+        name: textInput,
+        bought: false
+      };
+      setItems([...items, newItem]);
+      setTextInput('');
+    }
+
+    function markProduto (itemId) {
+      const newItems = items.map((item) =>{
+        if (item.id == itemId) {
+          return { ...item, bought: true }
+        }
+        return item;
+      });
+      setItems(newItems);
+    }
+
+    function unmarkProduto (itemId) {
+      const newItems = items.map((item) =>{
+        if (item.id == itemId) {
+          return { ...item, bought: false }
+        }
+        return item;
+      });
+      setItems(newItems);
+    }
+
+    function removeProduto (itemId) {
+      Alert.alert('Excluir Produto?',
+         'Confirma a exclusão deste Produto?',
+        [
+          {
+            text:'Sim', onPress: ()=> {
+              const newItems = items.filter(item => item.id != itemId);
+              setItems(newItems);
+            }
+          },
+          {
+            text: 'Cancelar', style: 'cancel'  
+          }
+        ]
+      );
+    }
+
+    function removeAll () {
+         Alert.alert('Limpar Lista?',
+         'Confirma a exclusão de todos os Produtos?',
+        [
+          {
+            text:'Sim', onPress: ()=> { setItems([]); }
+          },
+          {
+            text: 'Cancelar', style: 'cancel'  
+          }
+        ]
+      );
+    }
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#000000' }}>
-      <ImageBackground
-        source={require('../assets/background.jpg')}
-        resizeMode='repeat'
-        style={{ flex: 1, justifyContent: 'flex-start' }}
-      >
-        <View style={styles.header}>
-          <Text style={styles.title}>Lista de Compras</Text>
-          <Ionicons name='trash' size={32} color="#fff" />
-        </View>
+    <View style={{flex:1, backgroundColor: '#000'}}>
+        <ImageBackground
+            source={require('../assets/background.jpg')}
+            resizeMode ='repeat'
+            style={{ flex: 1, justifyContent: 'flex-start' }}
+        >
+            <View style={styles.header}>
+                <Text style={styles.title}>Lista de Compras</Text>
+                <Ionicons name='trash' size={32} color="#fff" onPress={removeAll}/>
+            </View>
 
-        {/* Lista de Produtos */}
-        <FlatList
-          contentContainerStyle={{ padding: 20, color: '#fff'}}
-          data={items}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => 
-            <ItemList item={item} />
-          }
-        />
-
-        <View style={styles.footer}>
-          <View style={styles.inputContainer}>
-            <TextInput
-              color="#fff"
-              fontSize={18}
-              placeholder='Digite o nome do produto...'
-              placeholderTextColor="#aeaeae"
-              value={textInput}
-              onChangeText={(text) => setTextInput(text)}
+            {/* Lista de Produtos */ }
+            <FlatList 
+              contentContainerStyle={{ padding: 20, color: '#fff'}}
+              data={items}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item}) => 
+                <ItemList 
+                  item={item}
+                  markItem={markProduto}
+                  unmarkItem={unmarkProduto}
+                  removeItem={removeProduto}
+                />
+              }
             />
-          </View>
-          <TouchableOpacity style={styles.iconContainer} onPress={addProduto}>
-            <Ionicons name="add" size={36} color="#fff" />
-          </TouchableOpacity>
-        </View>
-      </ImageBackground>
+
+            <View style={styles.footer}>
+                <View style={styles.inputContainer}>
+                    <TextInput
+                    color={"#fff"}
+                    fontSize={18}
+                    placeholder='Digite o nome do produto...'
+                    placeholderTextColor="#aeaeae"
+                    value={textInput}
+                    onChangeText={(text) => setTextInput(text)}
+                    />
+                </View>
+                <TouchableOpacity style={styles.iconContainer} onPress={addProduto}>
+                    <Ionicons name="add" size={36} color="#fff"/>
+                </TouchableOpacity>
+            </View>
+        </ImageBackground>
     </View>
   )
 }
@@ -79,7 +166,7 @@ export default function Home() {
 const styles = StyleSheet.create({
   header: {
     padding: 25,
-    paddingTop: 50,
+    paddingTop: 40,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -100,9 +187,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     backgroundColor: '#000000c0',
-    borderTopStartRadius: 30,
-    borderTopEndRadius: 30,
-    paddingBottom: 40,
+    borderBottomStartRadius: 30,
+    borderBottomEndRadius: 30,
+    paddingBottom: 30,
   },
   inputContainer: {
     marginVertical: 20,
@@ -114,7 +201,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     justifyContent: 'center',
   },
-  iconContainer: {
+  iconContainer : {
     borderRadius: 25,
     height: 50,
     width: 50,
